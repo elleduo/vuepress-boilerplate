@@ -42,11 +42,11 @@ jobs:
       #### Download and cache docs_repo
 
       - run:
-        # https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994/4
-        name: Write $docs_repo and $docs_branch to files
-        command: |
-          echo "$docs_repo" > __tmp_env_docs_repo
-          echo "$docs_branch" > __tmp_env_docs_branch
+          # https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994/4
+          name: Write $docs_repo and $docs_branch to files
+          command: |
+            echo "$docs_repo" > __tmp_env_docs_repo
+            echo "$docs_branch" > __tmp_env_docs_branch
 
       - restore_cache:
           keys:
