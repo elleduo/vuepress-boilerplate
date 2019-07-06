@@ -36,8 +36,8 @@ jobs:
       # configs to env
       # docs_repo, docs_branch, publish_repo, publish_branch
       - run:
-        name: Setup Configs As Environment Variables
-        command: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+          name: Setup Configs As Environment Variables
+          command: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
 
       #### Download and cache docs_repo
 
