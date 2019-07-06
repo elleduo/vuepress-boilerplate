@@ -35,20 +35,31 @@ jobs:
 
       # configs to env
       # docs_repo, docs_branch, publish_repo, publish_branch
-      - run: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+      - run:
+        name: Setup Configs As Environment Variables
+        command: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
 
       #### Download and cache docs_repo
 
+      - run:
+        # https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994/4
+        name: Write $docs_repo and $docs_branch to files
+        command: |
+          echo "$docs_repo" > __tmp_env_docs_repo
+          echo "$docs_branch" > __tmp_env_docs_branch
+
       - restore_cache:
           keys:
-            - v1-docs-{{ .Environment.docs_repo }}-{{ .Environment.docs_branch }}
-            - v1-docs-{{ .Environment.docs_repo }}
+            - v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
+            - v1-docs-{{ checksum "__tmp_env_docs_repo" }}
 
       - run:
+          name: Get docs repo
           command: |
             if [ -d docs_repo ]; then
               cd docs_repo
               git checkout -b "$docs_branch" -f
+              cd ..
             else
               git clone -b "$docs_branch" "$docs_repo_url" docs_repo
             fi
@@ -56,7 +67,7 @@ jobs:
       - save_cache:
           paths:
             - docs_repo
-          key: v1-docs-{{ .Environment.docs_repo }}-{{ .Environment.docs_branch }}
+          key: v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
 
       #### docs_repo -> docs
       - run: cp -R docs_repo/* docs/
