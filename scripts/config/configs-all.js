@@ -1,17 +1,12 @@
 const joi = require("@hapi/joi");
-const { schema: vuepressScheme } = require("./configs-vuepress");
+const { schemaObj: vuepressSchemeObj } = require("./configs-vuepress");
+const { schemaObj: setupSchemaObj } = require("./configs-setup");
 const { fieldsOfSchema } = require("./utils");
 
-exports.schema = vuepressScheme.keys({
-  repo: joi
-    .string()
-    .required()
-    .description("repo of docs"),
-  branch: joi
-    .string()
-    .default("master")
-    .description("brach of the repo of docs"),
-});
+exports.schema = joi
+  .object()
+  .keys(vuepressSchemeObj)
+  .keys(setupSchemaObj);
 
 exports.validate = options => {
   const { value, error } = this.schema.validate(options);

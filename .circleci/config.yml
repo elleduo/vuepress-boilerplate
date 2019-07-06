@@ -33,5 +33,32 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
+      # configs to env
+      # docs_repo, docs_branch, publish_repo, publish_branch
+      - run: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+
+      #### Download and cache docs_repo
+
+      - restore_cache:
+          keys:
+            - v1-docs-{{ .Environment.docs_repo }}-{{ .Environment.docs_branch }}
+            - v1-docs-{{ .Environment.docs_repo }}
+
+      - run: |
+          if [ -d docs_repo ]; then
+            cd docs_repo
+            git checkout -b "$docs_branch" -f
+          else
+            git clone -b "$docs_branch" "$docs_repo_url" docs_repo
+          fi
+
+      - save_cache:
+          paths:
+            - docs_repo
+          keys: v1-docs-{{ .Environment.docs_repo }}-{{ .Environment.docs_branch }}
+
+      #### docs_repo -> docs
+      - run: cp -R docs_repo/* docs/
+
       # build
       - run: npm run build
