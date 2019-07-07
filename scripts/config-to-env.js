@@ -1,14 +1,15 @@
 const { autoLoadConfigSync } = require("./config");
 
-const repoRegex = /^([^\/]+\/[^\/]+)(?:#(.+))?$/;
+const repoRegex = /^([^/]+\/[^/]+)(?:#(.+))?$/;
 
-const gitUrl = repo => `https://github.com/${repo}.git`;
+const gitUrl = (repo, ssh) =>
+  ssh ? `ssh://git@github.com:${repo}.git` : `https://github.com/${repo}.git`;
 
-function getRepoAndBranch(s, prefix) {
+function getRepoAndBranch(s, prefix, ssh) {
   const [, repo, branch = "master"] = repoRegex.exec(s);
   return {
     [prefix + "repo"]: repo,
-    [prefix + "repo_url"]: gitUrl(repo),
+    [prefix + "repo_url"]: gitUrl(repo, ssh),
     [prefix + "branch"]: branch,
   };
 }
@@ -17,8 +18,8 @@ exports.autoLoadSetupConfigAsEnvSync = () => {
   const c = autoLoadConfigSync();
 
   const exportEnvs = {
-    ...getRepoAndBranch(c.docsRepo, "docs_"),
-    ...getRepoAndBranch(c.publishRepo, "publish_"),
+    ...getRepoAndBranch(c.docsRepo, "docs_", true),
+    ...getRepoAndBranch(c.publishRepo, "publish_", true),
     publish_keep_history: c.keepPublishCommitHistory,
   };
 
