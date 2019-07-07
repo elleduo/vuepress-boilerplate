@@ -32,23 +32,33 @@ commands:
 
             if [ -d "$dir" ]; then
               if [ -d "$dir/.git" ]; then
+                cwd=`pwd`
                 cd "$dir"
-                cur_repo=`git remote show origin | grep -Po "Fetch URL: \K(\S+)"`
-                if [ "$cur_repo" = "$repo_url" ]; then
+                cur_repo_url=`git remote show origin | grep -Po "Fetch URL: \K(\S+)"`
+                cur_repo=`echo "$cur_repo_url" | grep -Po 'github.com/\K(.+).git$'`
+                cur_repo=${cur_repo%.git}
+
+                echo "Current repo > $cur_repo ($cur_repo_url)"
+
+                repo=`echo "$repo_url" | grep -Po 'github.com/\K(.+).git$'`
+                repo=${repo%.git}
+
+                echo "Checking out > $repo ($repo_url)"
+
+                if [ "$cur_repo_url" = "$repo_url" ] || [ "$cur_repo" = "$repo" ]; then
                   # right repo
                   git checkout -b "$branch" -f
                   exit 0
                 else
                   # wrong repo
-                  echo "Wrong dir ($dir) with $cur_repo to checkout repo ($repo_url)">&2
-                  exit 1
+                  echo "Wrong dir ($dir) with $cur_repo to checkout repo ($repo)"
+                  cd "$cwd"
                 fi
-              else
-                rmdir "$dir" || {
-                  echo "Non empty dir ($dir) to checkout repo ($repo_url)">&2
-                  exit 2
-                }
               fi
+
+              # $dir is not right
+              echo "del $dir"
+              rmdir -R "$dir"
             fi
 
             git clone -b "$branch" "$repo_url" "$dir"
