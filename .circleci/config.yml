@@ -11,6 +11,12 @@ executors:
     working_directory: ~/repo
 
 commands:
+  add_default_ssh_keys:
+    description: "Add ssh keys"
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - $github_user_key_fingerprint
   checkout_to_existing:
     description: "Check out a git repo to an existing dir"
     parameters:
@@ -90,6 +96,7 @@ jobs:
     executor: node-executor
 
     steps:
+      - add_default_ssh_keys
       - checkout
 
       # Download and cache dependencies
@@ -151,6 +158,7 @@ jobs:
     executor: node-executor
 
     steps:
+      - add_default_ssh_keys
       - attach_workspace:
           at: .
 
