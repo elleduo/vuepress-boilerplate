@@ -17,6 +17,7 @@ commands:
       - add_ssh_keys:
           fingerprints:
             - $github_user_key_fingerprint
+            - "74:ee:da:bc:be:bf:a8:8c:59:8b:12:57:6e:ab:44:96"
   checkout_to_existing:
     description: "Check out a git repo to an existing dir"
     parameters:
