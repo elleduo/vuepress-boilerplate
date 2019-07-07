@@ -31,7 +31,7 @@ commands:
             if [ -d "$dir" ]; then
               if [ -d "$dir/.git" ]; then
                 cd "$dir"
-                cur_repo=git remote show origin | grep -Po "Fetch URL: \K(\S+)"
+                cur_repo=`git remote show origin | grep -Po "Fetch URL: \K(\S+)"`
                 if [ "$cur_repo" = "$repo_url" ]; then
                   # right repo
                   git checkout -b "$branch" -f
