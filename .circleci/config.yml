@@ -54,8 +54,24 @@ commands:
   load_config_to_env:
     description: "Setup Configs As Environment Variables"
 
+    parameters:
+      save_env_file:
+        type: string
+        default: false
+
     steps:
-      - run: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+      - when:
+          condition: << parameters.save_env_file >>
+          steps:
+            - run:
+                name: "Save configs to env_file and setup as env vars"
+                command: |
+                  node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" > "<< parameters.save_env_file >>"
+                  cat "<< parameters.save_env_file >>" >> $BASH_ENV
+      - unless:
+          condition: << parameters.save_env_file >>
+          steps:
+            - run: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
 
 jobs:
   build:
@@ -80,7 +96,8 @@ jobs:
 
       # configs to env
       # docs_repo, docs_branch, publish_repo, publish_branch
-      - load_config_to_env
+      - load_config_to_env:
+          save_env_file: "docs/.vuepress/__loaded_envs__"
 
       #### Download and cache docs_repo
 
@@ -116,6 +133,7 @@ jobs:
           root: docs/.vuepress
           paths:
             - dist
+            - __loaded_envs__
 
   deploy:
     executor: node-executor
@@ -123,6 +141,8 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+
+      - run: cat __loaded_envs__ >> $BASH_ENV
 
       - run:
           name: "Ensure publish and docs are not same repo and branch"
@@ -154,12 +174,10 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - build:
-          context: org-global
+      - build
       - deploy:
           requires:
             - build
-          context: org-global
           filters:
             branches:
               only: master
