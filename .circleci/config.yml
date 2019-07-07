@@ -167,17 +167,21 @@ jobs:
       - run:
           name: ""
           command: |
-            if [$publish_keep_history]; then
+            if [ $publish_keep_history ]; then
               git clone -n --depth 1 -b "$publish_branch" "$publish_repo_url" publish_repo
               cp -R publish_repo/.git dist
               cd dist
               git add .
+              git config user.email "equalma@outlook.com"
+              git config user.name "vuepress boilerplate"
               git commit -m "update site"
               git push origin "$publish_branch"
             else
               cd dist
               git init
               git add .
+              git config user.email "equalma@outlook.com"
+              git config user.name "vuepress boilerplate"
               git commit -m "update site (force)"
               git push -f "$publish_repo_url" "$publish_branch"
             fi
