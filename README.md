@@ -3,6 +3,9 @@
 docsRepo: EqualMa/posts
 publishRepo: EqualMa/EqualMa.github.io
 
+# whether to keep commit history when publishing to repo
+keepPublishCommitHistory: true
+
 #### vuepress configs
 
 title: My Site

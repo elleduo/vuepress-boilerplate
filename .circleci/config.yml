@@ -2,19 +2,64 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: circleci/node:10.16
+    working_directory: ~/repo
+
+commands:
+  checkout_to_existing:
+    description: "Check out a git repo to an existing dir"
+    parameters:
+      dir:
+        type: string
+      repo_url:
+        type: env_var_name
+      branch:
+        type: env_var_name
+    steps:
+      - run:
+          name: Check git info and checkout
+          command: |
+            dir="<< parameters.dir >>"
+            repo_url=${<< parameters.repo_url >>}
+            branch=${<< parameters.branch >>}
+
+            if [ -d "$dir" ]; then
+              if [ -d "$dir/.git" ]; then
+                cd "$dir"
+                cur_repo=git remote show origin | grep -Po "Fetch URL: \K(\S+)"
+                if [ "$cur_repo" = "$repo_url" ]; then
+                  # right repo
+                  git checkout -b "$branch" -f
+                  exit 0
+                else
+                  # wrong repo
+                  echo "Wrong dir ($dir) to checkout repo ($repo_url)">&2
+                  exit 1
+                fi
+              else
+                rmdir "$dir" || {
+                  echo "Non empty dir ($dir) to checkout repo ($repo_url)">&2
+                  exit 2
+                }
+              fi
+            fi
+
+            git clone -b "$branch" "$repo_url" "$dir"
+
+  load_config_to_env:
+    description: "Setup Configs As Environment Variables"
+
+    steps:
+      - run: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+
 jobs:
   build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:10.16
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
+    executor: node-executor
 
     steps:
       - checkout
@@ -35,9 +80,7 @@ jobs:
 
       # configs to env
       # docs_repo, docs_branch, publish_repo, publish_branch
-      - run:
-          name: Setup Configs As Environment Variables
-          command: node -e "console.log(require('./scripts/config-to-env').autoLoadSetupConfigAsEnvSync())" >> $BASH_ENV
+      - load_config_to_env
 
       #### Download and cache docs_repo
 
@@ -53,16 +96,10 @@ jobs:
             - v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
             - v1-docs-{{ checksum "__tmp_env_docs_repo" }}
 
-      - run:
-          name: Get docs repo
-          command: |
-            if [ -d docs_repo ]; then
-              cd docs_repo
-              git checkout -b "$docs_branch" -f
-              cd ..
-            else
-              git clone -b "$docs_branch" "$docs_repo_url" docs_repo
-            fi
+      - checkout_to_existing:
+          dir: "docs_repo"
+          repo_url: "docs_repo_url"
+          branch: "docs_branch"
 
       - save_cache:
           paths:
@@ -74,3 +111,55 @@ jobs:
 
       # build
       - run: npm run build
+
+      - persist_to_workspace:
+          root: docs/.vuepress
+          paths:
+            - dist
+
+  deploy:
+    executor: node-executor
+
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: "Ensure publish and docs are not same repo and branch"
+          command: |
+            if [$docs_repo = $publish_repo] && [$docs_branch = $publish_branch]; then
+              echo "PublishRepo#branch can't be same with docsRepo#branch" >&2
+              exit 5
+            fi
+
+      - run:
+          name: ""
+          command: |
+            if [$publish_keep_history]; then
+              git clone -n --depth 1 -b "$publish_branch" "$publish_repo_url" publish_repo
+              cp -R publish_repo/.git dist
+              cd dist
+              git add .
+              git commit -m "update site"
+              git push origin "$publish_branch"
+            else
+              cd dist
+              git init
+              git add .
+              git commit -m "update site (force)"
+              git push -f "$publish_repo_url" "$publish_branch"
+            fi
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build:
+          context: org-global
+      - deploy:
+          requires:
+            - build
+          context: org-global
+          filters:
+            branches:
+              only: master
