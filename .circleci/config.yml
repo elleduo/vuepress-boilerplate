@@ -28,6 +28,8 @@ commands:
             repo_url=${<< parameters.repo_url >>}
             branch=${<< parameters.branch >>}
 
+            echo "Checking out $repo_url#$branch to $dir"
+
             if [ -d "$dir" ]; then
               if [ -d "$dir/.git" ]; then
                 cd "$dir"
@@ -38,7 +40,7 @@ commands:
                   exit 0
                 else
                   # wrong repo
-                  echo "Wrong dir ($dir) to checkout repo ($repo_url)">&2
+                  echo "Wrong dir ($dir) with $cur_repo to checkout repo ($repo_url)">&2
                   exit 1
                 fi
               else
