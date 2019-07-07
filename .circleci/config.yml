@@ -47,7 +47,7 @@ commands:
 
                 if [ "$cur_repo_url" = "$repo_url" ] || [ "$cur_repo" = "$repo" ]; then
                   # right repo
-                  git checkout -b "$branch" -f
+                  git checkout "$branch" -f
                   exit 0
                 else
                   # wrong repo
