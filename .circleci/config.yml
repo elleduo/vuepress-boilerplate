@@ -43,12 +43,12 @@ commands:
                 cwd=`pwd`
                 cd "$dir"
                 cur_repo_url=`git remote show origin | grep -Po "Fetch URL: \K(\S+)"`
-                cur_repo=`echo "$cur_repo_url" | grep -Po 'github.com/\K(.+).git$'`
+                cur_repo=`echo "$cur_repo_url" | grep -Po 'github.com(/|:)\K(.+).git$'`
                 cur_repo=${cur_repo%.git}
 
                 echo "Current repo > $cur_repo ($cur_repo_url)"
 
-                repo=`echo "$repo_url" | grep -Po 'github.com/\K(.+).git$'`
+                repo=`echo "$repo_url" | grep -Po 'github.com(/|:)\K(.+).git$'`
                 repo=${repo%.git}
 
                 echo "Checking out > $repo ($repo_url)"
