@@ -191,12 +191,16 @@ jobs:
               git clone -n --depth 1 -b "$publish_branch" "$publish_repo_url" publish_repo
               cp -R publish_repo/.git dist
               cd dist
+              git config user.email "$publish_user_email"
+              git config user.name "$publish_user_name"
               git add .
               git commit -m "update site"
               git push origin "$publish_branch"
             else
               cd dist
               git init
+              git config user.email "$publish_user_email"
+              git config user.name "$publish_user_name"
               git add .
               git commit -m "update site (force)"
               git push -f "$publish_repo_url" "$publish_branch"

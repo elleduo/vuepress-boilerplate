@@ -25,6 +25,8 @@ exports.autoLoadSetupConfigAsEnvSync = () => {
     ...getRepoAndBranch(c.docsRepo, "docs_", false),
     ...getRepoAndBranch(c.publishRepo, "publish_", false),
     publish_keep_history: c.keepPublishCommitHistory,
+    publish_user_name: c.publishUser.name,
+    publish_user_email: c.publishUser.email,
   };
 
   return Reflect.ownKeys(exportEnvs)

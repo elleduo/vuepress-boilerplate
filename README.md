@@ -3,6 +3,10 @@
 docsRepo: EqualMa/posts
 publishRepo: EqualMa/EqualMa.github.io
 
+publishUser:
+  name: "EqualMa"
+  email: "equalma@outlook.com"
+
 # whether to keep commit history when publishing to repo
 keepPublishCommitHistory: true
 

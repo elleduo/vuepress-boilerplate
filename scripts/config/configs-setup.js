@@ -16,6 +16,13 @@ exports.schemaObj = {
     .bool()
     .default(true)
     .description("whether to keep commit history when publishing to repo"),
+
+  publishUser: joi
+    .object({
+      name: joi.string().required(),
+      email: joi.string().required(),
+    })
+    .required(),
 };
 
 exports.fields = fieldsOfSchema(this.schemaObj);
