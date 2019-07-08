@@ -18,8 +18,8 @@ exports.autoLoadSetupConfigAsEnvSync = () => {
   const c = autoLoadConfigSync();
 
   const exportEnvs = {
-    ...getRepoAndBranch(c.docsRepo, "docs_", true),
-    ...getRepoAndBranch(c.publishRepo, "publish_", true),
+    ...getRepoAndBranch(c.docsRepo, "docs_", false),
+    ...getRepoAndBranch(c.publishRepo, "publish_", false),
     publish_keep_history: c.keepPublishCommitHistory,
   };
 
