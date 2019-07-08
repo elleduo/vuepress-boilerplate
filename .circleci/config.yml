@@ -160,8 +160,8 @@ jobs:
     executor: node-executor
 
     steps:
-      - add_default_ssh_keys
       - checkout
+      - add_default_ssh_keys
       - attach_workspace:
           at: .
 
