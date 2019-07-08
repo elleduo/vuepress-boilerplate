@@ -2,8 +2,12 @@ const { autoLoadConfigSync } = require("./config");
 
 const repoRegex = /^([^/]+\/[^/]+)(?:#(.+))?$/;
 
-const gitUrl = (repo, ssh) =>
-  ssh ? `ssh://git@github.com/${repo}.git` : `https://github.com/${repo}.git`;
+const gitUrl = (repo, ssh, absolute) =>
+  ssh && absolute
+    ? `ssh://git@github.com/${repo}.git`
+    : ssh && !absolute
+    ? `git@github.com:${repo}.git`
+    : `https://github.com/${repo}.git`;
 
 function getRepoAndBranch(s, prefix, ssh) {
   const [, repo, branch = "master"] = repoRegex.exec(s);
