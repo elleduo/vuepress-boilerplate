@@ -161,6 +161,7 @@ jobs:
 
     steps:
       - add_default_ssh_keys
+      - checkout
       - attach_workspace:
           at: .
 
