@@ -98,7 +98,6 @@ jobs:
     executor: node-executor
 
     steps:
-      - add_default_ssh_keys
       - checkout
 
       # Download and cache dependencies
@@ -169,7 +168,6 @@ jobs:
 
     steps:
       - checkout
-      - add_default_ssh_keys
       - attach_workspace:
           at: .
 
