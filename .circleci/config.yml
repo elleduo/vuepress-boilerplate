@@ -129,20 +129,20 @@ jobs:
             echo "$docs_repo" > __tmp_env_docs_repo
             echo "$docs_branch" > __tmp_env_docs_branch
 
-      - restore_cache:
-          keys:
-            - v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
-            - v1-docs-{{ checksum "__tmp_env_docs_repo" }}
+      # - restore_cache:
+      #     keys:
+      #       - v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
+      #       - v1-docs-{{ checksum "__tmp_env_docs_repo" }}
 
       - checkout_to_existing:
           dir: "docs_repo"
           repo_url: "docs_repo_url"
           branch: "docs_branch"
 
-      - save_cache:
-          paths:
-            - docs_repo
-          key: v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
+      # - save_cache:
+      #     paths:
+      #       - docs_repo
+      #     key: v1-docs-{{ checksum "__tmp_env_docs_repo" }}-{{ checksum "__tmp_env_docs_branch" }}
 
       #### docs_repo -> docs
       - run: cp -R docs_repo/* docs/
