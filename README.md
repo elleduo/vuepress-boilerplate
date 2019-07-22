@@ -1,11 +1,11 @@
 ---
 #### where to get your docs or posts. use `user/repo#branch-name` to specify branch
-docsRepo: EqualMa/posts
-publishRepo: EqualMa/EqualMa.github.io
+docsRepo: elleduo/posts
+publishRepo: elleduo/elleduo.github.io
 
 publishUser:
-  name: "EqualMa"
-  email: "equalma@outlook.com"
+  name: "ElleMa"
+  email: "elle.duo@outlook.com"
 
 # whether to keep commit history when publishing to repo
 keepPublishCommitHistory: true
